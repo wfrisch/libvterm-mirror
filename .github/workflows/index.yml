@@ -1,0 +1,29 @@
+name: Upstream bazaar mirror
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v4
+
+      - name: Install Bazaar
+        run: sudo apt-get install -y brz
+
+      - name: Pull upstream bzr repo
+        run: |
+          git config pull.rebase true
+          git config user.name "Mirror GitHub Action"
+          git config user.email "8fg8XYHX5lsZsCCe1mCWuf4OEIllwhz7@github.com"
+          git remote add upstream "bzr::lp:libvterm"
+          git pull upstream HEAD
+
+      - name: Push to GitHub
+        run: |
+          git push --tags
+          git push --force
